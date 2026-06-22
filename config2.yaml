@@ -1,0 +1,318 @@
+units:
+  # kx and ky allow for easy- easi-er switching between MX and Choc.
+  kx: u
+  ky: u
+  px: kx + 2
+  py: ky + 2
+  # These variables allow for updating the previews on https://ergogen.ceoloide.com
+  $default_width: u
+  $default_height: u
+  # KiCAD places the PCB in the middle of nowhere to start with.
+  # These variables give a starting place for later shifts.
+  starting_x: 100
+  starting_y: -100
+  # u is 19 mm
+
+  # Defaults to M2 Screws
+  screwSize: 1
+  standoffSize: 2.5
+
+meta:
+  engine: 4.1.0
+points:
+  key.tags: 
+    - key
+  zones:
+    matrix:
+      anchor:
+        shift: [100, -110] # Fix KiCad placement
+      columns:
+        c1:
+          key.stagger: u/4
+          key.splay: -5
+          key.column_net: P0
+            
+        c2:
+          # key.stagger: u/4
+          # key.splay: -5
+          key.spread: u+1
+          key.origin: [u, 0]
+          key.column_net: P1
+        c3:
+          key:
+            stagger: u/6
+            splay: -5
+            spread: u+1
+            column_net: P2
+        c4:
+          key.stagger: u/8
+          key.splay: -5
+          key.column_net: P3
+        c5:
+          key.stagger: -u/4
+          key.column_net: P4
+        c6:
+          key.stagger: -u/8
+          key.column_net: P5
+      rows:
+        r3:
+          key.row_net: P6
+        r2:
+          key.row_net: P6
+        r1:
+          key.row_net: P6
+    thumbfan:
+      anchor:
+        - ref: matrix_c4_r3
+          shift: [9.5,-25]
+      columns:
+        c4:
+        c5.key:
+          splay: -15
+          stagger: -2.7
+          spread: u + 2
+        c6.key:
+          splay: 75
+          stagger: 2
+          spread: u + 3.5
+          tags:
+            - key_1_5u
+      rows:
+        r0:
+
+  rotate: -11
+
+  mirror:
+    ref: thumbfan_c6_r0
+    distance: 70
+
+outlines:
+  _keycaps:
+    - what: rectangle
+      where: [key]
+      size: 18
+      fillet: 2
+    - what: rectangle
+      where: [key_1_5u]
+      size: [18*1.5,18]
+      fillet: 2
+  outline:
+    - what: path
+      segments: 
+
+        - type: arc #top left arc
+          points:
+          - ref: matrix_c1_r1
+            shift: [-0.6px, 0.6py]
+          - ref: matrix_c4_r1
+            shift: [0px, 0.6py]
+          - ref: matrix_c6_r1
+            shift: [0.6px, 0.6py]
+
+        - type: line #top connecting
+          points:
+          - ref: matrix_c6_r1
+            shift: [0.6px, 0.6py]
+          - ref: mirror_matrix_c6_r1
+            shift: [0.6px, 0.6py]
+
+        - type: arc #right top arc
+          points:
+          - ref: mirror_matrix_c4_r1
+            shift: [0, 0.6py]
+          - ref: mirror_matrix_c1_r1
+            shift: [-0.6px, 0.6py]
+
+        - type: line #bottom right line stuff
+          points:
+          - ref: mirror_matrix_c1_r1
+            shift: [-0.6px, 0.6py]
+          - ref: mirror_matrix_c1_r3
+            shift: [-0.6px, -0.6py]
+          - ref: mirror_matrix_c3_r3
+            shift: [0px, -py]
+          - ref: mirror_thumbfan_c4_r0
+            shift: [-0.6px, -0.6py]  
+
+        - type: arc #right thumb arc
+          points:
+          - ref: mirror_thumbfan_c5_r0
+            shift: [0, -0.6py]
+          - ref: mirror_thumbfan_c6_r0
+            shift: [-0.25kx-0.6px, -0.6py]  
+
+        - type: line #bottom center line stuff
+          points:
+          - ref: mirror_thumbfan_c6_r0
+            shift: [-0.25kx-0.6px, -0.6py]
+          - ref: mirror_thumbfan_c6_r0
+            shift: [0.25kx+0.6px, -0.6py]
+          - ref: thumbfan_c6_r0
+            shift: [0.25kx+0.6px, -0.6py]
+          - ref: thumbfan_c6_r0
+            shift: [-0.25kx-0.6px, -0.6py]
+
+        - type: arc #left thumb arc
+          points: 
+          - ref: thumbfan_c5_r0
+            shift: [0px, -0.6py]
+          - ref: thumbfan_c4_r0
+            shift: [-0.6px, -0.6py]
+            
+        - type: line #bottom left line stuff
+          points:
+          - ref: matrix_c3_r3
+            shift: [0, -ky]
+          - ref: matrix_c1_r3
+            shift: [-0.6px, -0.6py]
+          
+      fillet: 3 #duh
+
+  combo:
+    - name: outline
+    - operation: stack
+      name: _keycaps
+  
+  combo1:
+    - name: outline
+    - operation: subtract
+      name: _keycaps
+
+  switch_plate_keys:
+    - what: rectangle
+      where: true
+      size: [kx-5,ky-5] # this makes it 14mm, make it 13.8 for choc
+
+  realBoard:
+    - name: outline
+    - operation: subtract
+      name: switch_plate_keys
+    # - operation: stack
+    #   name: standoff
+    # - operation: stack
+    #   name: mounting
+
+  xlBoard:
+    - name: outline
+      expand: 2
+    # - name: mounting
+    #   operation: subtract
+
+
+  switch_plate:
+    - name: xlBoard
+    - operation: subtract
+      name: switch_plate_keys
+
+  wall_outline:
+    - name: xlBoard
+    - operation: subtract
+      name: outline
+
+
+pcbs:
+  goodwings:
+    outlines:
+      main:
+        outline: outline
+    template: kicad8
+    footprints:
+      choc_hotswap:
+        what: ceoloide/switch_choc_v1_v2
+        where: true
+        params:
+          hotswap: true
+          from: "{{column_net}}"
+          to: "{{colrow}}"
+      diode:
+        what: ceoloide/diode_tht_sod123
+        where: true
+        params:
+          from: "{{colrow}}"
+          to: "{{row_net}}"
+        adjust:
+          shift: [0, -5]
+      nicenano:
+        what: ceoloide/mcu_nice_nano
+        where:
+          ref: matrix_c6_r1
+          shift: [1.5kx, 0.1ky]
+          rotate: 28-3
+      battery_connector:
+        what: ceoloide/battery_connector_jst_ph_2
+        where: matrix_c6_r3
+        adjust:
+          shift: [2.5kx, 1.4ky]
+          rotate: 90+28-3
+      on_off_switch:
+        what: ceoloide/power_switch_smd_side
+        where:
+          ref: matrix_c6_r1
+          rotate: 90-14
+        params:
+          from: BAT_P
+          to: RAW
+        adjust:
+          shift: [0.71kx, 0ky]
+      reset_switch:
+        what: ceoloide/reset_switch_smd_side
+        params:
+          from: GND
+          to: RST
+        where: 
+          ref: matrix_c6_r1
+          rotate: 28-3-90+35
+        adjust:
+          shift: [0.92kx, 2.5ky]
+          rotate: 92
+
+      # the trackpad pins are not netted FYI    
+      trackpad:
+        what: cirque
+        params:
+          P1: nan
+          P2: nan
+          P3: nan
+          P4: nan
+          P5: nan
+          P6: nan
+          P7: nan
+          P8: nan
+          P9: nan
+          P10: nan
+          P11: nan
+          P12: nan
+          P13: nan
+          P14: nan
+        where: matrix_c6_r3
+        adjust:
+          shift: [2.2kx, 0.6ky]
+          rotate: +28-3
+cases:
+  # _holes:
+  #   - name: mounting
+  #     extrude: 2
+  # _standoffs:
+  #   - name: standoff
+  #     extrude: 2
+  wall:
+    - name: wall_outline
+      extrude: 7
+  plate_tester:
+    - what: case
+      name: wall
+    - name: switch_plate
+      shift: [0,0,5]
+      extrude: 2
+  case:
+    # - what: case
+    #   name: _standoffs
+    #   operation: add
+    # - what: case
+    #   name: _holes
+    #   operation: subtract
+    - what: case
+      name: wall
+      operation: add
+    - name: xlBoard
+      operation: add

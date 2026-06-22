@@ -1,0 +1,327 @@
+meta:
+  engine: 4.1.0
+  name: GW1
+  version: 1.0
+  author: theb0b
+  url: https://github.com/theb0b12/good-wings
+  inspo: BW2 from jasonhazel @ https://github.com/hazels-garage/bad-wings/tree/master/v2
+
+units:
+  w: 18
+  h: 17
+  kx: u
+  ky: u
+  px: kx + 2
+  py: ky + 2
+  # $default_width: u
+  # $default_height: u
+  starting_x: 100
+  starting_y: -130
+
+points:
+  key.tags: 
+    - key
+  key:
+    spread: w
+    padding: h
+    autobind: 0
+    height: h
+    width: w
+    origin: [-0.5w, -0.5h]
+  zones:
+    matrix:
+      anchor:
+        shift: [starting_x, starting_y]
+      rotate: -8
+      columns:
+        outer-pinky:
+        pinky:
+        ring:
+          key:
+            splay: -4
+            stagger: 0.75h
+        middle:
+          key:
+            splay: -3
+            stagger: 0.5h
+        index:
+          key:
+            stagger: -0.25h
+        inner:
+          key:
+            stagger: -2
+      rows:
+        bottom:
+        home:
+        top:
+      mirror:
+        ref: matrix_inner_top
+        shift: [0.5w, 0.5h]
+        distance: 22.5
+
+    thumbs:
+      anchor:
+        ref: matrix_inner_bottom
+        shift: [-w, -h - 2]
+      columns:
+        tuck:
+        middle:
+          key:
+            splay: -10
+        far:
+          key:
+            splay: -10
+      rows:
+        thumb:
+      mirror:
+        ref: matrix_inner_top
+        shift: [0.5w, 0.5h]
+        distance: 22.5
+
+
+outlines:
+  outer_outline:
+    - what: path
+      segments: 
+
+        - type: arc # thumb arc
+          points:
+          - ref: thumbs_far_thumb
+            shift: [0.6px, -0.6py]
+          - ref: thumbs_middle_thumb
+            shift: [0px, -0.6py]
+          - ref: thumbs_tuck_thumb
+            shift: [-0.6px, -0.6py]
+
+        - type: line # thumb to pinky line
+          points:
+          - ref: thumbs_tuck_thumb
+            shift: [-0.6px, 0ky]
+          - ref: matrix_pinky_bottom
+            shift: [0.6px, -0.6ky]
+          - ref: matrix_outer-pinky_bottom
+            shift: [-0.6px, -0.6ky]
+          - ref: matrix_outer-pinky_top
+            shift: [-0.6px, 0.6ky]
+
+        - type: line # top steplike lines
+          points:
+          - ref: matrix_ring_top
+            shift: [-0.6px, 0ky]
+          - ref: matrix_ring_top
+            shift: [-0.6px, 0.6ky]
+          - ref: matrix_middle_top
+            shift: [-0.6px, 0.15ky]
+          - ref: matrix_middle_top
+            shift: [-0.6px, 0.6ky]
+          - ref: matrix_middle_top
+            shift: [0.6px, 0.6ky]
+          - ref: matrix_middle_top
+            shift: [0.6px, 0.4ky]
+        
+        - type: arc # top arc
+          points:
+          - ref.aggregate.parts: [matrix_inner_top, mirror_matrix_inner_top]
+            shift: [0px, 0.6py]
+          - ref: mirror_matrix_middle_top
+            shift: [0.6px, 0.4ky]
+        
+        - type: line # top steplike lines mirror
+          points:
+          - ref: mirror_matrix_middle_top
+            shift: [0.6px, 0.4ky]
+          - ref: mirror_matrix_middle_top
+            shift: [0.6px, 0.6ky]
+          - ref: mirror_matrix_middle_top
+            shift: [-0.6px, 0.6ky]
+          - ref: mirror_matrix_middle_top
+            shift: [-0.6px, 0.15ky]
+          - ref: mirror_matrix_ring_top
+            shift: [-0.6px, 0.6ky]
+          - ref: mirror_matrix_ring_top
+            shift: [-0.6px, 0ky]
+        
+        - type: line # thumb to pinky line mirror
+          points:
+          - ref: mirror_matrix_outer-pinky_top
+            shift: [-0.6px, 0.6ky]
+          - ref: mirror_matrix_outer-pinky_bottom
+            shift: [-0.6px, -0.6ky]
+          - ref: mirror_matrix_pinky_bottom
+            shift: [0.6px, -0.6ky]
+          - ref: mirror_thumbs_tuck_thumb
+            shift: [-0.6px, 0ky]
+          - ref: mirror_thumbs_tuck_thumb
+            shift: [-0.6px, -0.6ky]
+        
+        - type: arc # thumb arc mirror
+          points:
+          - ref: mirror_thumbs_middle_thumb
+            shift: [0px, -0.6py]
+          - ref: mirror_thumbs_far_thumb
+            shift: [0.6px, -0.6py]
+
+        - type: line # thumb v shape thing bottom
+          points:
+          - ref: mirror_thumbs_far_thumb
+            shift: [0.6px, 0.3py]
+          - ref: thumbs_far_thumb
+            shift: [0.6px, 0.3py]
+          
+      fillet: 1
+
+  trackball_hole:
+    - what: rectangle
+      where:
+        ref.aggregate.parts: [matrix_inner_bottom, mirror_matrix_inner_bottom]
+      size: [20, 20]
+      adjust:
+        shift: [2, -7]
+      fillet: 1
+  
+  outline:
+    - name: outer_outline
+    - name: trackball_hole
+      operation: subtract
+
+  
+
+  keycaps:
+    - what: rectangle
+      where: true
+      size: [w-1,h-1]
+
+  combo:
+    - name: outline
+    - operation: stack
+      name: keycaps
+
+  switch_plate_keys:
+    - what: rectangle
+      where: true
+      size: [kx-5.1,ky-5.1] # this makes it 14mm, make it 13.8 for choc
+
+  realBoard:
+    - name: outer_outline
+    - operation: subtract
+      name: switch_plate_keys
+
+
+  xlBoard:
+    - name: outline
+      expand: 1.5
+
+  switch_plate:
+    - name: outline
+    - operation: subtract
+      name: switch_plate_keys
+
+  _wall_outline:
+    - name: xlBoard
+    - operation: subtract
+      name: outline
+
+
+
+pcbs:
+  goodwings:
+    template: kicad8
+    outlines:
+      main:
+        outline: outline
+    footprints:
+      choc_hotswap:
+        what: ceoloide/switch_choc_v1_v2
+        where: true
+        params:
+          hotswap: true
+          from: "{{column_net}}"
+          to: "{{colrow}}"
+          include_stabilizer_pad: false
+      mx_hotswap:
+        what: ceoloide/switch_mx
+        where: true
+        params:
+          hotswap: true
+          from: "{{column_net}}"
+          to: "{{colrow}}"
+        adjust:
+          rotate: 180
+
+      diode:
+        what: smd
+        where: true
+        params:
+          from: "{{colrow}}"
+          to: "{{row_net}}"
+        adjust:
+          shift: [0, -8]
+      
+      vikout:
+        what: vik_horizontal
+        where: 
+          ref.aggregate.parts: [matrix_inner_top, mirror_matrix_inner_top]
+        adjust:
+          shift: [18, -40]
+          rotate: 90
+
+      nicnano:
+        what: ceoloide/mcu_nice_nano
+        where: 
+          ref.aggregate.parts: [matrix_inner_top, mirror_matrix_inner_top]
+        adjust:
+          shift: [2, -4]
+      
+      battery_connector:
+        what: ceoloide/battery_connector_jst_ph_2
+        where: 
+          ref.aggregate.parts: [matrix_inner_top, mirror_matrix_inner_top]
+        adjust:
+          shift: [5, -25]
+          rotate: 90
+
+      on_off_switch:
+        what: ceoloide/power_switch_smd_side
+        where: 
+          ref.aggregate.parts: [matrix_inner_top, mirror_matrix_inner_top]
+        params:
+          from: BAT_P
+          to: RAW
+        adjust:
+          shift: [-14, 11.5]
+          rotate: 83
+
+      reset_switch:
+        what: ceoloide/reset_switch_smd_side
+        where: 
+          ref.aggregate.parts: [matrix_inner_top, mirror_matrix_inner_top]
+        adjust:
+          shift: [20, 12]
+          rotate: 9
+
+      shift_reg:
+        what: shift_reg
+        where: 
+          ref.aggregate.parts: [matrix_inner_top, mirror_matrix_inner_top]
+        adjust:
+          shift: [-12, -20]
+          rotate: -90
+
+
+cases:
+  _wall:
+    - name: _wall_outline
+      extrude: 7
+  plate_tester:
+    - what: case
+      name: _wall
+    - name: switch_plate
+      shift: [0,0,5]
+      extrude: 2
+
+  case:
+    - what: case
+      name: _wall
+      operation: add
+    - name: xlBoard
+      operation: add
